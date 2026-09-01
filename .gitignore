@@ -23,17 +23,16 @@ venv/
 .idea/
 .vscode/
 
-# Data and model artifacts
-data/raw/*
-data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-models/*.joblib
-models/*.bin
-models/*.safetensors
+# Data, models and generated experiment artifacts
+/data/
+/models/
 .cache/
 huggingface/
-reports/metrics/*_predictions.csv
+/reports/metrics/
+/reports/figures/*
+!/reports/figures/quick_logistic_regression_confusion_matrix.png
+!/reports/figures/quick_transformer_confusion_matrix.png
+!/reports/figures/streamlit_demo.png
 
 # Generated logs and temporary files
 *.log

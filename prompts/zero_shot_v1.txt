@@ -1,6 +1,0 @@
-Classifique o sentimento do texto a seguir sem presumir contexto externo.
-
-Texto:
-<texto>
-{text}
-</texto>

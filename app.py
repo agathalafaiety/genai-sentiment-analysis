@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from sentiment_analysis.config import MODELS_DIR
-from sentiment_analysis.inference import ClassicalPredictor
+from sentiment_analysis.training import ClassicalPredictor
 
 st.set_page_config(
     page_title="Sentimento PT-BR",

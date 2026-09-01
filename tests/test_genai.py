@@ -20,7 +20,7 @@ class MockProvider:
     def complete(self, *, instructions: str, prompt: str) -> str:
         self.calls += 1
         assert "classificador" in instructions
-        assert "Texto" in prompt
+        assert "<texto>" in prompt
         return self.response
 
 

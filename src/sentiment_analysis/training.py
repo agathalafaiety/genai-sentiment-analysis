@@ -6,18 +6,29 @@ import argparse
 import json
 import platform
 import sys
+import time
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import joblib
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import seaborn as sns
 import sklearn
+from pydantic import BaseModel, Field
 from sklearn.base import ClassifierMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+)
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import Pipeline
 
@@ -28,13 +39,7 @@ from sentiment_analysis.config import (
     MODELS_DIR,
     RANDOM_SEED,
 )
-from sentiment_analysis.data import load_splits, prepare_dataset
-from sentiment_analysis.evaluation import (
-    classification_metrics,
-    measure_prediction_latency,
-    save_confusion_matrix,
-)
-from sentiment_analysis.preprocessing import normalize_text
+from sentiment_analysis.data import load_splits, normalize_text, prepare_dataset
 
 
 @dataclass(frozen=True)
@@ -48,6 +53,137 @@ CANDIDATES = (
     Candidate("logistic_regression", "classifier__C", (0.5, 1.0, 2.0)),
     Candidate("complement_naive_bayes", "classifier__alpha", (0.25, 0.5, 1.0)),
 )
+
+
+class Prediction(BaseModel):
+    sentiment: str
+    confidence: float = Field(ge=0, le=1)
+    probabilities: dict[str, float]
+    latency_ms: float = Field(ge=0)
+
+
+class ClassicalPredictor:
+    """Carrega o pipeline salvo e retorna classe, probabilidades e latencia."""
+
+    def __init__(self, model_path: Path | None = None, *, mode: str = "quick") -> None:
+        self.model_path = Path(model_path or MODELS_DIR / f"best_classical_{mode}.joblib")
+        if not self.model_path.exists():
+            raise FileNotFoundError(
+                f"Modelo nao encontrado em {self.model_path}. "
+                f"Execute: python -m sentiment_analysis.training --mode {mode} --prepare"
+            )
+        self.pipeline = joblib.load(self.model_path)
+
+    def predict(self, text: str) -> Prediction:
+        if not str(text).strip():
+            raise ValueError("Informe um texto nao vazio")
+        started = time.perf_counter()
+        predicted = str(self.pipeline.predict([text])[0])
+        probabilities = self._probabilities(text)
+        return Prediction(
+            sentiment=predicted,
+            confidence=probabilities[predicted],
+            probabilities=probabilities,
+            latency_ms=(time.perf_counter() - started) * 1_000,
+        )
+
+    def _probabilities(self, text: str) -> dict[str, float]:
+        if hasattr(self.pipeline, "predict_proba"):
+            values = self.pipeline.predict_proba([text])[0]
+        else:
+            scores = np.asarray(self.pipeline.decision_function([text])).reshape(-1)
+            exponentials = np.exp(scores - scores.max())
+            values = exponentials / exponentials.sum()
+        classes = [str(value) for value in self.pipeline.classes_]
+        mapping = {label: float(value) for label, value in zip(classes, values, strict=True)}
+        return {label: mapping.get(label, 0.0) for label in LABELS}
+
+
+def classification_metrics(
+    y_true: Sequence[str],
+    y_pred: Sequence[str],
+    *,
+    labels: Sequence[str] = LABELS,
+) -> dict[str, Any]:
+    """Calcula metricas globais, por classe, erros e matriz de confusao."""
+    if len(y_true) != len(y_pred) or not y_true:
+        raise ValueError("y_true e y_pred devem ter o mesmo tamanho nao vazio")
+    report = classification_report(
+        y_true,
+        y_pred,
+        labels=list(labels),
+        output_dict=True,
+        zero_division=0,
+    )
+    errors = int(
+        sum(expected != predicted for expected, predicted in zip(y_true, y_pred, strict=True))
+    )
+    return {
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "macro_f1": float(
+            f1_score(y_true, y_pred, labels=list(labels), average="macro", zero_division=0)
+        ),
+        "weighted_f1": float(
+            f1_score(y_true, y_pred, labels=list(labels), average="weighted", zero_division=0)
+        ),
+        "per_class": {
+            label: {
+                "precision": float(report[label]["precision"]),
+                "recall": float(report[label]["recall"]),
+                "f1": float(report[label]["f1-score"]),
+                "support": int(report[label]["support"]),
+            }
+            for label in labels
+        },
+        "confusion_matrix": confusion_matrix(y_true, y_pred, labels=list(labels)).tolist(),
+        "errors": errors,
+        "error_rate": errors / len(y_true),
+        "n_samples": len(y_true),
+    }
+
+
+def measure_prediction_latency(
+    predict: Callable[[Sequence[str]], Sequence[str]],
+    texts: Sequence[str],
+    *,
+    repeats: int = 3,
+) -> tuple[list[str], float]:
+    if not texts:
+        raise ValueError("texts nao pode ser vazio")
+    predictions: list[str] = []
+    elapsed_values = []
+    for _ in range(repeats):
+        started = time.perf_counter()
+        predictions = list(predict(texts))
+        elapsed_values.append(time.perf_counter() - started)
+    return predictions, float(np.mean(elapsed_values) * 1_000 / len(texts))
+
+
+def save_confusion_matrix(
+    matrix: Sequence[Sequence[int]],
+    destination: Path,
+    *,
+    title: str,
+    labels: Sequence[str] = LABELS,
+) -> Path:
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(6.4, 5.2))
+    sns.heatmap(
+        matrix,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=labels,
+        yticklabels=labels,
+        cbar=False,
+        ax=axis,
+    )
+    axis.set(title=title, xlabel="Predito", ylabel="Real")
+    figure.tight_layout()
+    figure.savefig(destination, dpi=160, bbox_inches="tight")
+    plt.close(figure)
+    return destination
 
 
 def build_pipeline(model_name: str, *, parameter_value: float = 1.0) -> Pipeline:

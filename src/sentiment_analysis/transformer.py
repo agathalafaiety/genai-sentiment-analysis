@@ -18,7 +18,7 @@ from sentiment_analysis.config import (
     TRANSFORMER_REVISION,
 )
 from sentiment_analysis.data import load_splits
-from sentiment_analysis.evaluation import classification_metrics, save_confusion_matrix
+from sentiment_analysis.training import classification_metrics, save_confusion_matrix
 
 
 class TransformerPredictor:
@@ -28,7 +28,7 @@ class TransformerPredictor:
             import transformers
             from transformers import pipeline
         except ImportError as exc:
-            raise RuntimeError("Instale requirements-transformer.txt") from exc
+            raise RuntimeError("Instale o extra opcional: pip install -e .[transformer]") from exc
         self.torch_version = torch.__version__
         self.transformers_version = transformers.__version__
         self.classifier = pipeline(

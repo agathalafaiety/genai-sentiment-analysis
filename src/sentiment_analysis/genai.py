@@ -64,10 +64,13 @@ def parse_genai_response(raw_response: str) -> GenAIResult:
 
 
 def load_prompt(name: str, directory: Path = PROMPTS_DIR) -> str:
-    path = Path(directory) / name
+    path = Path(directory) / "prompts.json"
     if not path.exists():
         raise FileNotFoundError(f"Prompt versionado nao encontrado: {path}")
-    return path.read_text(encoding="utf-8").strip()
+    prompts = json.loads(path.read_text(encoding="utf-8"))
+    if name not in prompts:
+        raise KeyError(f"Prompt desconhecido: {name}")
+    return str(prompts[name]).strip()
 
 
 class GenAIClassifier:
@@ -80,8 +83,8 @@ class GenAIClassifier:
     def classify(self, text: str) -> GenAIResult:
         if not str(text).strip():
             raise ValueError("Informe um texto nao vazio")
-        instructions = load_prompt("system_v1.txt")
-        template = load_prompt(f"{self.strategy}_v1.txt")
+        instructions = load_prompt("system_v1")
+        template = load_prompt(f"{self.strategy}_v1")
         raw = self.provider.complete(instructions=instructions, prompt=template.format(text=text))
         return parse_genai_response(raw)
 
@@ -144,9 +147,7 @@ class LocalTransformersProvider:
         try:
             from transformers import pipeline
         except ImportError as exc:
-            raise GenAIError(
-                "Instale requirements-transformer.txt para usar o modelo local"
-            ) from exc
+            raise GenAIError("Instale o extra opcional: pip install -e .[transformer]") from exc
         self.generator = pipeline(
             "text-generation",
             model=model_id,
