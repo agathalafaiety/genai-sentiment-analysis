@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genai-sentiment-analysis"
+version = "0.1.0"
+description = "Estudo reproduzivel de analise de sentimentos em portugues"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "agathalafaiety" }]
+dependencies = [
+  "joblib>=1.4,<2",
+  "matplotlib>=3.9,<4",
+  "numpy>=2.0,<3",
+  "pandas>=2.2,<3",
+  "pydantic>=2.9,<3",
+  "requests>=2.32,<3",
+  "scikit-learn>=1.5,<2",
+  "seaborn>=0.13,<1",
+  "streamlit>=1.40,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "nbclient>=0.10,<1",
+  "nbformat>=5.10,<6",
+  "pytest>=8.3,<10",
+  "ruff>=0.8,<1",
+]
+transformer = [
+  "accelerate>=1.2,<2",
+  "torch>=2.6,<3",
+  "transformers>=4.48,<6",
+]
+genai = ["openai>=1.60,<3"]
+notebooks = ["ipykernel>=6.29,<8", "jupyterlab>=4.3,<5"]
+
+[project.scripts]
+sentiment-data = "sentiment_analysis.data:main"
+sentiment-train = "sentiment_analysis.training:main"
+sentiment-transformer = "sentiment_analysis.transformer:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q --disable-warnings --strict-markers"
+testpaths = ["tests"]
+markers = ["integration: tests that use network or heavyweight models"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"

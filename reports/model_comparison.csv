@@ -1,0 +1,7 @@
+Modelo,Macro F1,Weighted F1,Latência média (ms/item),Amostras,Observações
+Baseline majoritário,0.16666666666666666,0.16666666666666666,0.0005889814794365386,720.0,Teste quick balanceado; métrica observada em CPU.
+Regressão Logística,0.7504194888939191,0.7504194888939192,0.05681407407825679,720.0,Teste quick balanceado; métrica observada em CPU.
+Complement Naive Bayes,0.7261588160168282,0.7261588160168283,0.07005328703868414,720.0,Teste quick balanceado; métrica observada em CPU.
+Transformer,0.4879174685729124,0.48791746857291235,51.01096472222303,720.0,"Zero-shot, revisão fixada; domínio de treino diferente do B2W."
+GenAI zero-shot,,,,,N/A — exige provedor opcional.
+GenAI few-shot,,,,,N/A — exige provedor opcional.

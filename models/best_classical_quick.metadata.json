@@ -1,0 +1,21 @@
+{
+  "mode": "quick",
+  "random_seed": 42,
+  "labels": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "best_model": "logistic_regression",
+  "selection_metric": "validation_macro_f1",
+  "split_sizes": {
+    "train": 2304,
+    "validation": 576,
+    "test": 720
+  },
+  "runtime": {
+    "python": "3.13.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "scikit_learn": "1.9.0"
+  }
+}
