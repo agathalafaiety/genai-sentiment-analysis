@@ -1,47 +1,47 @@
 <h1 align="center">GenAI Sentiment Analysis</h1>
 
 <p align="center">
-  Sentiment classification for Brazilian e-commerce reviews, from a simple baseline to classical ML, Transformers, and optional GenAI.
+  Classificação de sentimentos em avaliações de e-commerce brasileiro: do baseline simples a ML clássico, Transformers e GenAI opcional.
 </p>
 
 <p align="center">
   <a href="https://www.python.org/"><img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white"></a>
   <a href="https://scikit-learn.org/"><img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&amp;logoColor=white"></a>
   <a href="https://streamlit.io/"><img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
-  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2EA44F"></a>
+  <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/badge/Licen%C3%A7a-MIT-2EA44F"></a>
 </p>
 
 <p align="center">
-  <a href="https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb">Open in Colab</a> ·
-  <a href="notebooks/analysis.ipynb">View analysis</a> ·
-  <a href="reports/model_comparison.csv">Explore results</a>
+  <a href="https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb">Abrir no Colab</a> ·
+  <a href="notebooks/analysis.ipynb">Ver análise</a> ·
+  <a href="reports/model_comparison.csv">Explorar resultados</a>
 </p>
 
-## Overview
+## Visão geral
 
-This project compares four approaches under the same reproducible evaluation pipeline:
+O projeto compara quatro abordagens no mesmo fluxo de avaliação reproduzível:
 
-- Majority-class baseline
-- TF-IDF with Logistic Regression and Complement Naive Bayes
-- Multilingual Transformer
-- Optional zero-shot and few-shot GenAI providers
+- Baseline de classe majoritária
+- TF-IDF com Regressão Logística e Complement Naive Bayes
+- Transformer multilíngue
+- Provedores GenAI opcionais com zero-shot e few-shot
 
-The default workflow is local, CPU-friendly, and does not require a paid API.
+O fluxo principal roda localmente em CPU e não exige API paga.
 
-## Results
+## Resultados
 
-Quick-mode evaluation on 720 balanced test reviews:
+Avaliação rápida com 720 avaliações balanceadas no conjunto de teste:
 
-| Model | Macro F1 | Latency / item |
+| Modelo | Macro F1 | Latência por item |
 |---|---:|---:|
-| **TF-IDF + Logistic Regression** | **0.7504** | **0.0568 ms** |
-| TF-IDF + Complement Naive Bayes | 0.7262 | 0.0701 ms |
-| Multilingual Transformer | 0.4879 | 51.0110 ms |
-| Majority baseline | 0.1667 | 0.0006 ms |
+| **TF-IDF + Regressão Logística** | **0,7504** | **0,0568 ms** |
+| TF-IDF + Complement Naive Bayes | 0,7262 | 0,0701 ms |
+| Transformer multilíngue | 0,4879 | 51,0110 ms |
+| Baseline majoritário | 0,1667 | 0,0006 ms |
 
-Logistic Regression achieved the best balance between quality, speed, and simplicity.
+A Regressão Logística apresentou o melhor equilíbrio entre qualidade, velocidade e simplicidade.
 
-## Quick start
+## Como executar
 
 ```powershell
 python -m venv .venv
@@ -51,47 +51,47 @@ python -m sentiment_analysis.training --mode quick --prepare
 streamlit run app.py
 ```
 
-On macOS or Linux, activate the environment with `source .venv/bin/activate`.
+No macOS ou Linux, ative o ambiente com `source .venv/bin/activate`.
 
-## Project structure
+## Estrutura
 
 ```text
-app.py                    Streamlit demo
-notebooks/                Analysis and Colab notebooks
-prompts/prompts.json      Versioned GenAI prompts
-reports/                  Results and key figures
-src/sentiment_analysis/   Data, training, inference, and providers
-tests/                    Essential test suite
+app.py                    Demonstração em Streamlit
+notebooks/                Análise e notebook para Colab
+prompts/prompts.json      Prompts GenAI versionados
+reports/                  Resultados e figuras principais
+src/sentiment_analysis/   Dados, treinamento, inferência e provedores
+tests/                    Testes essenciais
 ```
 
-## Optional models
+## Recursos opcionais
 
 ```bash
 # Transformer
 pip install -e .[transformer]
 python -m sentiment_analysis.transformer --mode quick --device -1
 
-# OpenAI provider
+# Provedor OpenAI
 pip install -e .[genai]
 
-# Tests and linting
+# Testes e qualidade
 pip install -e .[dev]
 pytest
 ruff check .
 ```
 
-GenAI calls are disabled by default. API credentials are read only from environment variables, and responses are validated with a strict Pydantic schema.
+As chamadas GenAI ficam desativadas por padrão. As credenciais são lidas apenas de variáveis de ambiente, e as respostas são validadas com um esquema Pydantic estrito.
 
-## Data
+## Dados
 
-The project uses the public [B2W-Reviews01](https://github.com/americanas-tech/b2w-reviews01) dataset. Ratings are mapped as follows:
+O projeto utiliza o conjunto público [B2W-Reviews01](https://github.com/americanas-tech/b2w-reviews01). As notas são convertidas assim:
 
-| Rating | Label |
+| Nota | Classe |
 |---|---|
-| 1–2 stars | `negative` |
-| 3 stars | `neutral` |
-| 4–5 stars | `positive` |
+| 1–2 estrelas | `negative` |
+| 3 estrelas | `neutral` |
+| 4–5 estrelas | `positive` |
 
-Splits are stratified and deterministic with seed 42. TF-IDF is fitted only on training data to prevent leakage.
+As divisões são estratificadas e determinísticas, com seed 42. O TF-IDF é ajustado apenas nos dados de treino para evitar vazamento de informação.
 
-The repository code is licensed under [MIT](LICENSE). B2W-Reviews01 remains under its original CC BY-NC-SA 4.0 license.
+O código está sob a [licença MIT](LICENSE). O B2W-Reviews01 permanece sob sua licença original CC BY-NC-SA 4.0.
