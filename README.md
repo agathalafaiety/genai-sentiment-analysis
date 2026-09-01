@@ -1,111 +1,97 @@
-# GenAI Sentiment Analysis — português
+<h1 align="center">GenAI Sentiment Analysis</h1>
 
-[![CI](https://github.com/agathalafaiety/genai-sentiment-analysis/actions/workflows/ci.yml/badge.svg)](https://github.com/agathalafaiety/genai-sentiment-analysis/actions/workflows/ci.yml)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![MIT](https://img.shields.io/badge/Code-MIT-green.svg)](LICENSE)
+<p align="center">
+  Sentiment classification for Brazilian e-commerce reviews, from a simple baseline to classical ML, Transformers, and optional GenAI.
+</p>
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb)
+<p align="center">
+  <a href="https://www.python.org/"><img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white"></a>
+  <a href="https://scikit-learn.org/"><img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&amp;logoColor=white"></a>
+  <a href="https://streamlit.io/"><img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2EA44F"></a>
+</p>
 
-Projeto enxuto e reproduzível de análise de sentimentos em português. Compara baseline, Machine Learning clássico, Transformer e uma integração GenAI opcional, sem exigir API paga no fluxo principal.
+<p align="center">
+  <a href="https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb">Open in Colab</a> ·
+  <a href="notebooks/analysis.ipynb">View analysis</a> ·
+  <a href="reports/model_comparison.csv">Explore results</a>
+</p>
 
-![Demo Streamlit](reports/figures/streamlit_demo.png)
+## Overview
 
-## Resultados reais
+This project compares four approaches under the same reproducible evaluation pipeline:
 
-Avaliação no modo `quick`, com 720 reviews de teste balanceadas e execução em CPU:
+- Majority-class baseline
+- TF-IDF with Logistic Regression and Complement Naive Bayes
+- Multilingual Transformer
+- Optional zero-shot and few-shot GenAI providers
 
-| Modelo | Macro F1 | Latência média |
+The default workflow is local, CPU-friendly, and does not require a paid API.
+
+## Results
+
+Quick-mode evaluation on 720 balanced test reviews:
+
+| Model | Macro F1 | Latency / item |
 |---|---:|---:|
-| Baseline majoritário | 0,1667 | 0,0006 ms/item |
-| **TF-IDF + Regressão Logística** | **0,7504** | **0,0568 ms/item** |
-| TF-IDF + Complement Naive Bayes | 0,7262 | 0,0701 ms/item |
-| Transformer zero-shot | 0,4879 | 51,0110 ms/item |
-| GenAI zero/few-shot | N/A | N/A |
+| **TF-IDF + Logistic Regression** | **0.7504** | **0.0568 ms** |
+| TF-IDF + Complement Naive Bayes | 0.7262 | 0.0701 ms |
+| Multilingual Transformer | 0.4879 | 51.0110 ms |
+| Majority baseline | 0.1667 | 0.0006 ms |
 
-| Melhor modelo clássico | Transformer zero-shot |
-|---|---|
-| ![Matriz de confusão da Regressão Logística](reports/figures/quick_logistic_regression_confusion_matrix.png) | ![Matriz de confusão do Transformer](reports/figures/quick_transformer_confusion_matrix.png) |
+Logistic Regression achieved the best balance between quality, speed, and simplicity.
 
-A Regressão Logística foi o melhor modelo. O Transformer raramente reconheceu a classe neutra, mostrando que um modelo maior não substitui alinhamento de domínio.
-
-Os resultados completos estão em [`reports/model_comparison.csv`](reports/model_comparison.csv) e no notebook [`analysis.ipynb`](notebooks/analysis.ipynb).
-
-## Dados e metodologia
-
-O projeto usa o [B2W-Reviews01](https://github.com/americanas-tech/b2w-reviews01), corpus público de reviews brasileiras de e-commerce sob licença **CC BY-NC-SA 4.0**. A licença MIT deste repositório cobre apenas o código.
-
-Mapeamento dos rótulos:
-
-- 1–2 estrelas: `negative`
-- 3 estrelas: `neutral`
-- 4–5 estrelas: `positive`
-
-Após limpeza e deduplicação, restaram 129.331 reviews. O modo `quick` usa até 1.200 exemplos por classe; o modo `full` usa todos os textos válidos. O split é estratificado em treino, validação e teste com seed 42. O vocabulário TF-IDF é ajustado apenas no treino para evitar leakage.
-
-O Transformer avaliado é [`lxyuan/distilbert-base-multilingual-cased-sentiments-student`](https://huggingface.co/lxyuan/distilbert-base-multilingual-cased-sentiments-student), revisão fixada e licença Apache 2.0.
-
-## Executar
+## Quick start
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m sentiment_analysis.training --mode quick --prepare
 streamlit run app.py
 ```
 
-macOS/Linux usa `source .venv/bin/activate` no lugar da ativação PowerShell.
+On macOS or Linux, activate the environment with `source .venv/bin/activate`.
 
-Outros comandos:
+## Project structure
+
+```text
+app.py                    Streamlit demo
+notebooks/                Analysis and Colab notebooks
+prompts/prompts.json      Versioned GenAI prompts
+reports/                  Results and key figures
+src/sentiment_analysis/   Data, training, inference, and providers
+tests/                    Essential test suite
+```
+
+## Optional models
 
 ```bash
-# Preparar dados
-python -m sentiment_analysis.data --mode quick
-python -m sentiment_analysis.data --mode full
-
-# Transformer opcional
+# Transformer
 pip install -e .[transformer]
 python -m sentiment_analysis.transformer --mode quick --device -1
 
-# Testes e qualidade
+# OpenAI provider
+pip install -e .[genai]
+
+# Tests and linting
 pip install -e .[dev]
 pytest
 ruff check .
-ruff format --check .
 ```
 
-## GenAI opcional
+GenAI calls are disabled by default. API credentials are read only from environment variables, and responses are validated with a strict Pydantic schema.
 
-Os prompts zero-shot e few-shot estão versionados em [`prompts/prompts.json`](prompts/prompts.json). A saída é validada no formato:
+## Data
 
-```json
-{
-  "sentiment": "positive",
-  "confidence": 0.91,
-  "explanation": "O texto contém um elogio direto."
-}
-```
+The project uses the public [B2W-Reviews01](https://github.com/americanas-tech/b2w-reviews01) dataset. Ratings are mapped as follows:
 
-Nenhuma chamada paga ocorre por padrão. O adaptador OpenAI usa Structured Outputs e lê `OPENAI_API_KEY` apenas do ambiente. Também existe um provedor local opcional baseado em Qwen2.5-1.5B-Instruct. Mocks são usados somente nos testes e não entram nas métricas científicas.
+| Rating | Label |
+|---|---|
+| 1–2 stars | `negative` |
+| 3 stars | `neutral` |
+| 4–5 stars | `positive` |
 
-## Limitações
+Splits are stratified and deterministic with seed 42. TF-IDF is fitted only on training data to prevent leakage.
 
-- As estrelas são rótulos fracos e podem discordar do texto.
-- O corpus cobre e-commerce brasileiro de 2018.
-- Ironia, avaliações mistas, negação e textos curtos continuam difíceis.
-- O modo quick é artificialmente balanceado.
-- O projeto não deve ser usado sozinho para decisões sobre pessoas.
-
-## Estrutura
-
-```text
-├── app.py                    # demo Streamlit
-├── notebooks/               # análise consolidada e Colab
-├── prompts/prompts.json      # prompts GenAI versionados
-├── reports/                 # comparação e figuras principais
-├── src/sentiment_analysis/  # dados, modelos e inferência
-└── tests/                   # testes essenciais
-```
-
-Código sob licença [MIT](LICENSE). Dataset B2W-Reviews01 sob CC BY-NC-SA 4.0. Autoria: [agathalafaiety](https://github.com/agathalafaiety).
+The repository code is licensed under [MIT](LICENSE). B2W-Reviews01 remains under its original CC BY-NC-SA 4.0 license.
