@@ -7,11 +7,12 @@
 <p align="center">
   <a href="https://www.python.org/"><img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white"></a>
   <a href="https://scikit-learn.org/"><img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&amp;logoColor=white"></a>
-  <a href="https://streamlit.io/"><img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
+  <a href="https://genai-sentiment-analysit.streamlit.app/"><img alt="Demonstração no Streamlit" src="https://img.shields.io/badge/Streamlit-Abrir_app-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
   <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/badge/Licen%C3%A7a-MIT-2EA44F"></a>
 </p>
 
 <p align="center">
+  <a href="https://genai-sentiment-analysit.streamlit.app/">Abrir demonstração</a> ·
   <a href="https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb">Abrir no Colab</a> ·
   <a href="notebooks/analysis.ipynb">Ver análise</a> ·
   <a href="reports/model_comparison.csv">Explorar resultados</a>
@@ -48,7 +49,7 @@ A Regressão Logística apresentou o melhor equilíbrio entre qualidade, velocid
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -e .
 python -m sentiment_analysis.training --mode quick --prepare
 streamlit run app.py
 ```
@@ -61,7 +62,7 @@ No macOS ou Linux, ative o ambiente com `source .venv/bin/activate`.
 app.py                    Demonstração em Streamlit
 notebooks/                Análise e notebook para Colab
 prompts/prompts.json      Prompts GenAI versionados
-reports/                  Resultados e figuras principais
+reports/                  Resultados consolidados
 src/sentiment_analysis/   Dados, treinamento, inferência e provedores
 tests/                    Testes essenciais
 ```
