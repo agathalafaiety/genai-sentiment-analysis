@@ -11,6 +11,7 @@ import pytest
 from sentiment_analysis.data import (
     DataValidationError,
     combine_review_text,
+    file_sha256,
     normalize_text,
     split_data,
     stratified_sample,
@@ -122,3 +123,16 @@ def test_only_two_valid_notebooks_remain() -> None:
     for name in expected:
         notebook = json.loads((root / "notebooks" / name).read_text(encoding="utf-8"))
         nbformat.validate(nbformat.from_dict(notebook))
+
+
+def test_deployment_model_matches_metadata() -> None:
+    root = Path(__file__).resolve().parents[1]
+    model_path = root / "models" / "best_classical_quick.joblib"
+    metadata_path = root / "models" / "best_classical_quick.metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    assert file_sha256(model_path) == metadata["artifact"]["sha256"]
+    assert ClassicalPredictor(model_path).predict("Produto excelente").sentiment in {
+        "negative",
+        "neutral",
+        "positive",
+    }

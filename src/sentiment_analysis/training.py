@@ -39,7 +39,7 @@ from sentiment_analysis.config import (
     MODELS_DIR,
     RANDOM_SEED,
 )
-from sentiment_analysis.data import load_splits, normalize_text, prepare_dataset
+from sentiment_analysis.data import file_sha256, load_splits, normalize_text, prepare_dataset
 
 
 @dataclass(frozen=True)
@@ -294,6 +294,11 @@ def train_classical_models(
         "labels": list(LABELS),
         "best_model": best_name,
         "selection_metric": "validation_macro_f1",
+        "best_model_test_metrics": {
+            key: results[best_name][key]
+            for key in ("accuracy", "macro_f1", "weighted_f1", "latency_ms_per_sample")
+        },
+        "artifact": {"filename": model_path.name, "sha256": file_sha256(model_path)},
         "split_sizes": {name: len(frame) for name, frame in splits.items()},
         "runtime": {
             "python": sys.version.split()[0],

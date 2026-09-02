@@ -1,7 +1,7 @@
 Modelo,Macro F1,Weighted F1,Latência média (ms/item),Amostras,Observações
-Baseline majoritário,0.16666666666666666,0.16666666666666666,0.0005889814794365386,720.0,Teste quick balanceado; métrica observada em CPU.
-Regressão Logística,0.7504194888939191,0.7504194888939192,0.05681407407825679,720.0,Teste quick balanceado; métrica observada em CPU.
-Complement Naive Bayes,0.7261588160168282,0.7261588160168283,0.07005328703868414,720.0,Teste quick balanceado; métrica observada em CPU.
+Baseline majoritário,0.16666666666666666,0.16666666666666666,0.009793101849532427,720.0,Teste quick balanceado; métrica observada em CPU.
+Regressão Logística,0.7504194888939191,0.7504194888939192,0.05287819444169549,720.0,Teste quick balanceado; métrica observada em CPU.
+Complement Naive Bayes,0.7261588160168282,0.7261588160168283,0.058197268514993114,720.0,Teste quick balanceado; métrica observada em CPU.
 Transformer,0.4879174685729124,0.48791746857291235,51.01096472222303,720.0,"Zero-shot, revisão fixada; domínio de treino diferente do B2W."
-GenAI zero-shot,,,,,N/A — exige provedor opcional.
-GenAI few-shot,,,,,N/A — exige provedor opcional.
+GenAI local zero-shot,0.3703703703703704,0.37037037037037035,16313.073344444598,9.0,"Qwen2.5-0.5B-Instruct; 100% de respostas válidas; amostra exploratória balanceada."
+GenAI local few-shot,0.719047619047619,0.719047619047619,14661.897966666504,9.0,"Qwen2.5-0.5B-Instruct; 77,8% de respostas válidas; amostra exploratória balanceada."

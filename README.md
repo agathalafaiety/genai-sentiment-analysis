@@ -30,16 +30,18 @@ O fluxo principal roda localmente em CPU e não exige API paga.
 
 ## Resultados
 
-Avaliação rápida com 720 avaliações balanceadas no conjunto de teste:
+Resultados observados em CPU; o tamanho de cada avaliação aparece na última coluna:
 
-| Modelo | Macro F1 | Latência por item |
-|---|---:|---:|
-| **TF-IDF + Regressão Logística** | **0,7504** | **0,0568 ms** |
-| TF-IDF + Complement Naive Bayes | 0,7262 | 0,0701 ms |
-| Transformer multilíngue | 0,4879 | 51,0110 ms |
-| Baseline majoritário | 0,1667 | 0,0006 ms |
+| Modelo | Macro F1 | Latência por item | Amostras |
+|---|---:|---:|---:|
+| **TF-IDF + Regressão Logística** | **0,7504** | **0,0529 ms** | 720 |
+| TF-IDF + Complement Naive Bayes | 0,7262 | 0,0582 ms | 720 |
+| GenAI local few-shot | 0,7190 | 14.661,90 ms | 9 |
+| Transformer multilíngue | 0,4879 | 51,0110 ms | 720 |
+| GenAI local zero-shot | 0,3704 | 16.313,07 ms | 9 |
+| Baseline majoritário | 0,1667 | 0,0098 ms | 720 |
 
-A Regressão Logística apresentou o melhor equilíbrio entre qualidade, velocidade e simplicidade.
+A Regressão Logística apresentou o melhor equilíbrio entre qualidade, velocidade e simplicidade. Os resultados GenAI usam uma amostra menor e servem como experimento exploratório, não como comparação direta com o teste completo.
 
 ## Como executar
 
@@ -73,6 +75,11 @@ python -m sentiment_analysis.transformer --mode quick --device -1
 
 # Provedor OpenAI
 pip install -e .[genai]
+python -m sentiment_analysis.genai --provider openai --strategy both --limit 30
+
+# GenAI local, sem API paga
+pip install -e .[transformer]
+python -m sentiment_analysis.genai --provider local --strategy both --limit 9
 
 # Testes e qualidade
 pip install -e .[dev]

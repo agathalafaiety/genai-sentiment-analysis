@@ -17,7 +17,7 @@ dependencies = [
   "pandas>=2.2,<3",
   "pydantic>=2.9,<3",
   "requests>=2.32,<3",
-  "scikit-learn>=1.5,<2",
+  "scikit-learn>=1.9,<1.10",
   "seaborn>=0.13,<1",
   "streamlit>=1.40,<2",
 ]
@@ -39,6 +39,7 @@ notebooks = ["ipykernel>=6.29,<8", "jupyterlab>=4.3,<5"]
 
 [project.scripts]
 sentiment-data = "sentiment_analysis.data:main"
+sentiment-genai = "sentiment_analysis.genai:main"
 sentiment-train = "sentiment_analysis.training:main"
 sentiment-transformer = "sentiment_analysis.transformer:main"
 

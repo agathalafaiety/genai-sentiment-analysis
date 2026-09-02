@@ -1,6 +1,8 @@
 import sys
 import types
+from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from sentiment_analysis.genai import (
@@ -8,11 +10,16 @@ from sentiment_analysis.genai import (
     GenAIError,
     InvalidGenAIResponse,
     OpenAIProvider,
+    balanced_evaluation_sample,
+    evaluate_genai,
     parse_genai_response,
 )
 
 
 class MockProvider:
+    provider_name = "mock"
+    model_id = "deterministic-mock"
+
     def __init__(self, response: str) -> None:
         self.response = response
         self.calls = 0
@@ -66,7 +73,7 @@ def test_safe_classifier_captures_provider_failure() -> None:
 
 def test_openai_provider_stays_disabled_without_key(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    with pytest.raises(GenAIError, match="nao configurada"):
+    with pytest.raises(GenAIError, match="não configurada"):
         OpenAIProvider()
 
 
@@ -101,7 +108,47 @@ def test_openai_provider_requests_strict_structured_output(
     assert "positive" in raw
     assert captured["model"] == "test-model"
     assert captured["store"] is False
+    assert captured["max_output_tokens"] == 250
     schema_format = captured["text"]["format"]
     assert schema_format["type"] == "json_schema"
     assert schema_format["strict"] is True
     assert schema_format["schema"]["additionalProperties"] is False
+
+
+def test_balanced_evaluation_sample() -> None:
+    frame = pd.DataFrame(
+        [
+            {"text": f"{label}-{index}", "label": label}
+            for label in ("negative", "neutral", "positive")
+            for index in range(10)
+        ]
+    )
+    sample = balanced_evaluation_sample(frame, 9)
+    assert sample["label"].value_counts().to_dict() == {
+        "negative": 3,
+        "neutral": 3,
+        "positive": 3,
+    }
+
+
+def test_evaluate_genai_persists_auditable_results(tmp_path: Path) -> None:
+    frame = pd.DataFrame(
+        [
+            {"text": f"texto {label}", "label": label}
+            for label in ("negative", "neutral", "positive")
+        ]
+    )
+    provider = MockProvider(
+        '{"sentiment":"positive","confidence":0.8,"explanation":"Resposta válida."}'
+    )
+    metrics = evaluate_genai(
+        frame,
+        provider,
+        strategy="zero_shot",
+        limit=3,
+        metrics_dir=tmp_path,
+    )
+    assert metrics["n_samples"] == 3
+    assert metrics["validity_rate"] == 1
+    assert (tmp_path / "quick_genai_mock_zero_shot_metrics.json").exists()
+    assert (tmp_path / "quick_genai_mock_zero_shot_predictions.csv").exists()

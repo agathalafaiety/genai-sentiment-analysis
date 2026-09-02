@@ -8,6 +8,16 @@
   ],
   "best_model": "logistic_regression",
   "selection_metric": "validation_macro_f1",
+  "best_model_test_metrics": {
+    "accuracy": 0.7541666666666667,
+    "macro_f1": 0.7504194888939191,
+    "weighted_f1": 0.7504194888939192,
+    "latency_ms_per_sample": 0.05287819444169549
+  },
+  "artifact": {
+    "filename": "best_classical_quick.joblib",
+    "sha256": "cd970fe2a8b759d3ff222aef3046f5e393752ee9d4762e40cdbe1faee89908c6"
+  },
   "split_sizes": {
     "train": 2304,
     "validation": 576,

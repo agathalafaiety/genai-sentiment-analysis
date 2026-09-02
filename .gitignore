@@ -5,6 +5,7 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+build/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
@@ -25,14 +26,13 @@ venv/
 
 # Data, models and generated experiment artifacts
 /data/
-/models/
+/models/*
+!/models/best_classical_quick.joblib
+!/models/best_classical_quick.metadata.json
 .cache/
 huggingface/
 /reports/metrics/
-/reports/figures/*
-!/reports/figures/quick_logistic_regression_confusion_matrix.png
-!/reports/figures/quick_transformer_confusion_matrix.png
-!/reports/figures/streamlit_demo.png
+/reports/figures/
 
 # Generated logs and temporary files
 *.log
