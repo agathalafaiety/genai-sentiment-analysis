@@ -7,12 +7,12 @@
 <p align="center">
   <a href="https://www.python.org/"><img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white"></a>
   <a href="https://scikit-learn.org/"><img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&amp;logoColor=white"></a>
-  <a href="https://genai-sentiment-analysit.streamlit.app/"><img alt="Demonstração no Streamlit" src="https://img.shields.io/badge/Streamlit-Abrir_app-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
+  <a href="https://genai-sentiment-app.streamlit.app/"><img alt="Demonstração no Streamlit" src="https://img.shields.io/badge/Streamlit-Abrir_app-FF4B4B?logo=streamlit&amp;logoColor=white"></a>
   <a href="LICENSE"><img alt="Licença MIT" src="https://img.shields.io/badge/Licen%C3%A7a-MIT-2EA44F"></a>
 </p>
 
 <p align="center">
-  <a href="https://genai-sentiment-analysit.streamlit.app/">Abrir demonstração</a> ·
+  <a href="https://genai-sentiment-app.streamlit.app/">Abrir demonstração</a> ·
   <a href="https://colab.research.google.com/github/agathalafaiety/genai-sentiment-analysis/blob/main/notebooks/demo_colab.ipynb">Abrir no Colab</a> ·
   <a href="notebooks/analysis.ipynb">Ver análise</a> ·
   <a href="reports/model_comparison.csv">Explorar resultados</a>
