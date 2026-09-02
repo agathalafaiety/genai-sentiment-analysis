@@ -203,6 +203,8 @@ class LocalTransformersProvider:
         self.generation_config.temperature = None
         self.generation_config.top_p = None
         self.generation_config.top_k = None
+        self.generator.generation_config = self.generation_config
+        self.generator.model.generation_config = copy.deepcopy(self.generation_config)
 
     def complete(self, *, instructions: str, prompt: str) -> str:
         local_schema = (
@@ -216,7 +218,6 @@ class LocalTransformersProvider:
         ]
         output = self.generator(
             messages,
-            generation_config=self.generation_config,
             clean_up_tokenization_spaces=False,
         )
         generated = output[0]["generated_text"]
