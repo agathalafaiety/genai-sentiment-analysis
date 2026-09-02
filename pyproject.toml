@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Estudo reproduzivel de analise de sentimentos em portugues"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
 authors = [{ name = "agathalafaiety" }]
 dependencies = [
   "joblib>=1.4,<2",
@@ -48,6 +48,9 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.poetry]
+packages = [{ include = "sentiment_analysis", from = "src" }]
 
 [tool.pytest.ini_options]
 addopts = "-q --disable-warnings --strict-markers"
